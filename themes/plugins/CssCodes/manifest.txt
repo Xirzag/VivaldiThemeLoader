@@ -1,0 +1,8 @@
+{
+	"manifest-version": "0.1",
+
+    "name": "Css codes",
+    "version": "0.1",
+    "image": "icon.png",
+    "execute": "main.py"
+}
