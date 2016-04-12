@@ -1,20 +1,28 @@
 import tkinter as tk
 import sys
 import ConfigLoader as conf
+import ModuleLoader as plugin
+import ModuleDisplay
+import VivaldiAPI as viv
 
 counter = 0
 
 
 def main(argv=None):
+
+    config = conf.ConfigLoader()
     root = tk.Tk()
-    config = conf.ConfigLoader(root)
     config.load();
+    viv.__api_config = config
 
     root.title("Vivaldi Theme Loader")
-    label = tk.Label(root, fg="green", text="Patch succesfully applied")
-    label.pack(padx=40, pady=20)
+    #root.geometry("530x320")
 
+    plugins = plugin.get_modules_from(config.option["vivaldiThemeFolder"] + "/plugins")
+
+    ModuleDisplay.display(root, plugins)
     root.mainloop()
+
     return 0
 
 

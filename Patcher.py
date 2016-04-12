@@ -1,27 +1,26 @@
+import os
 import tkMessageBox
 import VivaldiPathFinder as path
 
 
-def patchifnot(vivaldi_folder, vivaldi_theme_folder):
-    _patchvivaldi(vivaldi_folder, vivaldi_theme_folder)
-    _patchthemefolder(vivaldi_theme_folder)
+def patch_if_not(config):
+    _patch_vivaldi(config)
+    _patch_config_folder(config)
 
 
-_THEME_FILE = "custom.css"
-
-
-def _patchstyle(common, vivaldithemefolder):
+def _patch_style(common, config):
     common.seek(0, 0)
     content = common.read()
     common.seek(0, 0)
     common.write("/* Vivaldi Theme Loader */\n"
-                 "@import " + vivaldithemefolder + "/" + _THEME_FILE + "\n"
+                 "@import " + config.custom_css_path() + "\n"
                  + content)
 
 
-def _patchthemefolder(vivaldi_theme_folder):
+def _patch_config_folder(config):
     try:
-        open(vivaldi_theme_folder+"/" + _THEME_FILE, 'a').close()
+        open(config.custom_css_path(), 'a').close()
+        try_create_plugin_folder(config)
     except Exception as e:
         tkMessageBox.showerror("Error checking theme file",
                                "Can't open or create theme file\n\n"
@@ -29,13 +28,20 @@ def _patchthemefolder(vivaldi_theme_folder):
         exit(2)
 
 
-def _patchvivaldi(vivaldi_folder, vivaldi_theme_folder):
+def try_create_plugin_folder(config):
     try:
-        common = open(vivaldi_folder + path.COMMONCSS_PATH, "rw+")
+        os.mkdir(config.plugins_folder_path())
+    except:
+        pass
+
+
+def _patch_vivaldi(config):
+    try:
+        common = open(config.common_css_path(), "rw+")
         firstline = common.readline().rstrip('\n')
 
-        if firstline != "@import " + vivaldi_theme_folder + "/" + _THEME_FILE:
-            _patchstyle(common, vivaldi_theme_folder)
+        if firstline != "@import " + config.custom_css_path():
+            _patch_style(common, config)
 
         common.close()
 
